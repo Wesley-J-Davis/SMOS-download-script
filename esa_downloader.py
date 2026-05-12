@@ -21,8 +21,19 @@ YEAR = args.year
 MONTH = args.month
 DAY = args.day
 
-username = sys.argv[1]
-password = sys.argv[2]
+# Open and read the YAML file
+try:
+    with open('config.yaml', 'r') as file:
+        config = yaml.safe_load(file)
+
+    # Access your credentials from the dictionary
+    username = config['credentials']['username']
+    password = config['credentials']['password']
+
+except FileNotFoundError:
+    print("The configuration file was not found.")
+except yaml.YAMLError as exc:
+    print(f"Error parsing the YAML file: {exc}")
 
 login_url = "https://smos-diss.eo.esa.int/oads/access/login"
 search_url = "https://smos-diss.eo.esa.int/oads/access/collection/SMOS_Open_V7/searchbyfilename"

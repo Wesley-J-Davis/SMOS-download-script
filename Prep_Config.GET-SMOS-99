@@ -1,0 +1,5 @@
+SMOS_TYPES = BWLF1C,SCLF1C,SMUDP2
+SMOS_BASE  = /home/dao_ops/operations/GIT-OPS/SMOS-download-script
+SMOS_PYTHON_PATH = /usr/local/other/GEOSpyD/24.3.0-0/2024-08-29/envs/py3.11/bin/python
+SMOS_STAGE = /discover/nobackup/dao_ops/SMOS/AOSMOS.4662
+SMOS_CONFIG = /gpfsm/dhome/dao_ops/operations/GIT-OPS/SMOS-download-script/config.yaml
