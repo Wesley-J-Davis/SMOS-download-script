@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 #
-# PROGRAM: qfed_driver.pl is the operational driver for the SMOS-2
+# PROGRAM: smos_driver.pl is the operational driver for the SMOS-2
 # processing.
 # 
 # 25Aug10 R. Lucchesi - initial implementation.
-# 23Jan16 W. Davis    - adapted for qfed3 implementation
+# 23Jan16 W. Davis    - adapted for smos implementation
 # The setting of the options and the module lookup paths will
 # be done first using the BEGIN subroutine.  This section of the
 # program executes before the rest of the program is even compiled.
@@ -75,14 +75,14 @@ BEGIN {
       $RUN_CONFIG_FILE = "DEFAULT";
    }
 
-#  If qfed_driver.pl is initiated by the scheduler, construct table
+#  If smos_driver.pl is initiated by the scheduler, construct table
 # info. for "task_state" table of scheduler
 
    if ( defined( $sched_id ) )
    {
       $tab_status = 1;
       $tab_argv = "$sched_cnfg, $sched_id, $sched_synp, $sched_c_dt";
-      $fl_name = "qfed3";
+      $fl_name = "smos";
    }
 
 # ID for the preprocessing run.
@@ -94,8 +94,8 @@ $prep_ID = flk;
    if ( $opt_O ) { 
       system ("mkdir -p $opt_O");
       if ( -w "$opt_O" ) {
-        $listing_file    = "$opt_O/qfed3_${prep_ID}.$$.listing";
-        $listing_file_gz    = "$opt_O/qfed3_${prep_ID}.$$.listing_gz";
+        $listing_file    = "$opt_O/smos_${prep_ID}.$$.listing";
+        $listing_file_gz    = "$opt_O/smos_${prep_ID}.$$.listing_gz";
         print "Standard output redirecting to $listing_file\n";
         open (STDOUT, ">$listing_file");
         open (STDERR, ">&" . STDOUT);
@@ -111,7 +111,7 @@ $prep_ID = flk;
        print STDERR <<'ENDOFHELP';
 Usage:
 
-   qfed_driver.pl [-E Prep_Config] [-P GEOSDAS_Path] [-R Run_Config] [ -O output_location ] [ -d process_date ] [ -t synoptic_time ]
+   smos_driver.pl [-E Prep_Config] [-P GEOSDAS_Path] [-R Run_Config] [ -O output_location ] [ -d process_date ] [ -t synoptic_time ]
 
    Normal options and arguments:
 
@@ -122,7 +122,7 @@ Usage:
    -E Prep_Config
          The full path to the preprocessing configuration file.  This file contains
          parameters needed by the preprocessing control programs. If not given, a
-         file named $HOME/$prep_ID/Prep_Config is used.  qfed_driver.pl exits with an
+         file named $HOME/$prep_ID/Prep_Config is used.  smos_driver.pl exits with an
          error if neither of these files exist.
 
          The parameters set from this file are
@@ -156,14 +156,14 @@ Usage:
 
    -R Run_Config
          Name of file (with path name, if necessary) to read to obtain the 
-         run-time (execution) configuration parameters.  qfed_driver.pl reads this
+         run-time (execution) configuration parameters.  smos_driver.pl reads this
          file to obtain configuration information at run time.  
 
-         If given, qfed_driver.pl uses this file.  Otherwise, qfed_driver.pl looks for a 
+         If given, smos_driver.pl uses this file.  Otherwise, smos_driver.pl looks for a 
          file named "Run_Config" in the user's home directory, then the 
          $GEOSDAS_PATH/bin directory.  $GEOSDAS_PATH is given by the -P option if
          set, or it is taken to be the parent directory of the directory in which this
-         script resides.  It is an error if qfed_driver.pl does not find this file, 
+         script resides.  It is an error if smos_driver.pl does not find this file, 
          but in the GEOS DAS production environment, a default Run_Config file is always 
          present in the bin directory.
 
@@ -256,8 +256,8 @@ $exit_stat = 0;
 
 # Write start message to Event Log
 
-err_log (0, "qfed3_driver.pl", "$prep_ID","$env","-1",
-        {'err_desc' => "$prep_ID qfed_driver.pl job has started - Standard output redirecting to $listing_file"});
+err_log (0, "smos_driver.pl", "$prep_ID","$env","-1",
+        {'err_desc' => "$prep_ID smos_driver.pl job has started - Standard output redirecting to $listing_file"});
 
 # Use Prep_Config file under the preprocessing run's directory in the user's home directory
 # as the default.
@@ -279,31 +279,31 @@ if ( "$PREP_CONFIG_FILE" eq "DEFAULT" ) {
 
 # Does the Prep_Config file exist?  If not, die.
 if ( ! -e "$PREP_CONFIG_FILE" ) {
-    err_log (4, "qfed3_driver.pl", "$err_time","$prep_ID","-1",
+    err_log (4, "smos_driver.pl", "$err_time","$prep_ID","-1",
 	     {'err_desc' => "error $PREP_CONFIG_FILE not found."});
     die "error $PREP_CONFIG_FILE not found.";
 }
 
 # Read from Prep_Config environment settings needed by SMOS-2 processing.
 ( $SMOS_TYPES = extract_config( "SMOS_TYPES", $PREP_CONFIG_FILE, "NONE" ) ) ne "NONE"
-   or die "(qfed3_driver.pl) ERROR - can not set SMOS_BASE configuration value\n";
+   or die "(smos_driver.pl) ERROR - can not set SMOS_BASE configuration value\n";
 
 ( $SMOS_BASE = extract_config( "SMOS_BASE", $PREP_CONFIG_FILE, "NONE" ) ) ne "NONE"
-   or die "(qfed3_driver.pl) ERROR - can not set SMOS_BASE configuration value\n";
+   or die "(smos_driver.pl) ERROR - can not set SMOS_BASE configuration value\n";
 $ENV{'SMOS'} = $SMOS_BASE;
 
 ( $SMOS_PYTHON_PATH = extract_config( "SMOS_PYTHON_PATH", $PREP_CONFIG_FILE, "NONE" ) ) ne "NONE"
-   or die "(qfed3_driver.pl) WARNING - can not set SMOS_PYTHON_PATH configuration value\n";
+   or die "(smos_driver.pl) WARNING - can not set SMOS_PYTHON_PATH configuration value\n";
 
 # Read directory information for input data.
 
 ( $SMOS_CONFIG = extract_config( "SMOS_CONFIG", $PREP_CONFIG_FILE, "NONE" ) ) ne "NONE"
-   or print "(qfed3_driver.pl) WARNING - can not set SMOS_PYTHON_PATH configuration value\n";
+   or print "(smos_driver.pl) WARNING - can not set SMOS_PYTHON_PATH configuration value\n";
 
 # Get output directories
 
-( $SMOS_STAGE = extract_config( "SMOS_OUTPUT_BASE", $PREP_CONFIG_FILE, "NONE" ) ) ne "NONE"
-   or die "(qfed3_driver.pl) ERROR - can not set SMOS_NCKS configuration value\n";
+( $SMOS_STAGE = extract_config( "SMOS_STAGE", $PREP_CONFIG_FILE, "NONE" ) ) ne "NONE"
+   or die "(smos_driver.pl) ERROR - can not set SMOS_STAGE configuration value\n";
 
 # Make directories, if needed.
 # identify output dirs and clean them prior to running
@@ -344,8 +344,8 @@ print "PATH=$ENV{'PATH'}\n";
 
 my ($year, $month, $day) = $process_date =~ /(\d{4})(\d{2})(\d{2})/;
 print "$year : $month : $day\n";
-foreach my $SMOS_TYPES (@type) {
-  $cmd_tmpl = "python esa_downloader.py -p $SMOS_TYPE -y %y4 -m %m2 -d %d2";
+foreach $key ( split(/,/, $SMOS_TYPES) ) {
+  $cmd_tmpl = "python esa_downloader.py -p $key -y %y4 -m %m2 -d %d2";
   print "$cmd_tmpl\n";
 
   $cmd = token_resolve("${cmd_tmpl}", $process_date);
@@ -354,10 +354,10 @@ foreach my $SMOS_TYPES (@type) {
   $rc=system("$cmd");
   print "RETURN CODE=$rc\n";
   if ($rc != 0 ) {
-    err_log (4, "qfed3_driver.pl", "$err_time","$prep_ID","-1",
-	     {'err_desc' => "Error running qfed_l3a.py.  Check listing."});
+    err_log (4, "smos_driver.pl", "$err_time","$prep_ID","-1",
+	     {'err_desc' => "Error running smos_l3a.py.  Check listing."});
     recd_state( $fl_name, FAILED, $tab_argv, $sched_dir, $sched_sts_fl );
-    die "error running qfed_l3a.py";
+    die "error running smos_l3a.py";
   }
 }
   ########################
@@ -365,10 +365,10 @@ foreach my $SMOS_TYPES (@type) {
   ########################
 
 if ( $opt_O ) {
-    system ("mv $listing_file $opt_O/qfed3_${prep_ID}.${err_time}.listing");
+    system ("mv $listing_file $opt_O/smos_${prep_ID}.${err_time}.listing");
 }
 
-#  If qfed_driver.pl is initiated by the scheduler and the output file size
+#  If smos_driver.pl is initiated by the scheduler and the output file size
 # is not zero, write COMPLETE to a task status file.
 
 if ( defined( $sched_id ) && $tab_status != 0 ){
