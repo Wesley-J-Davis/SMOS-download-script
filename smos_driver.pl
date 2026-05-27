@@ -27,6 +27,7 @@ BEGIN {
    use Getopt::Std;
    use Getopt::Long;
 
+
 # Get options and arguments
 
    $num_args=$#ARGV;
@@ -180,6 +181,9 @@ ENDOFHELP
 
    use File::Basename;
 
+# This module finds the current working directory
+   use Cwd;
+
 # If default GEOS DAS path, set path to parent directory of directory where this
 # script resides.  
 
@@ -320,15 +324,14 @@ $ENV{'SMOS'} = $SMOS_BASE;
 
 $ENV{'PATH'} = join( ':', "${SMOS_BASE}/bin/:/discover/nobackup/projects/gmao/share/dasilva/bin/", $ENV{'PATH'} );
  do "/usr/share/modules/init/perl";
- module ("purge");
+# module ("purge");
 
-eval { chdir "$SMOS_BASE"  };
-foreach $var (sort(keys(%ENV))) {
-    $val = $ENV{$var};
-    $val =~ s|\n|\\n|g;
-    $val =~ s|"|\\"|g;
-    print "${var}=\"${val}\"\n";
-}
+#foreach $var (sort(keys(%ENV))) {
+#    $val = $ENV{$var};
+#    $val =~ s|\n|\\n|g;
+#    $val =~ s|"|\\"|g;
+#    print "${var}=\"${val}\"\n";
+#}
 
 
 #**********************#
@@ -345,7 +348,11 @@ print "PATH=$ENV{'PATH'}\n";
 my ($year, $month, $day) = $process_date =~ /(\d{4})(\d{2})(\d{2})/;
 print "$year : $month : $day\n";
 foreach $key ( split(/,/, $SMOS_TYPES) ) {
-  $cmd_tmpl = "python esa_downloader.py -p $key -y %y4 -m %m2 -d %d2";
+  print "${SMOS_STAGE}/${key}\n";
+  chdir("${SMOS_STAGE}/${key}") or die "Cannot change to directory '$directory': $!\n";
+  my $current_dir = getcwd();
+  print "Current directory is $current_dir\n";
+  $cmd_tmpl = "${SMOS_PYTHON_PATH}/python ${SMOS_BASE}/esa_downloader.py -p $key -y %y4 -m %m2 -d %d2";
   print "$cmd_tmpl\n";
 
   $cmd = token_resolve("${cmd_tmpl}", $process_date);
@@ -355,11 +362,23 @@ foreach $key ( split(/,/, $SMOS_TYPES) ) {
   print "RETURN CODE=$rc\n";
   if ($rc != 0 ) {
     err_log (4, "smos_driver.pl", "$err_time","$prep_ID","-1",
-	     {'err_desc' => "Error running smos_l3a.py.  Check listing."});
+	     {'err_desc' => "Error running esa_downloader.py.  Check listing."});
     recd_state( $fl_name, FAILED, $tab_argv, $sched_dir, $sched_sts_fl );
-    die "error running smos_l3a.py";
+    die "error running esa_downloader.py";
   }
+
+#  $cmd2 = "${SMOS_BASE}/reorg.sh";
+#  $rc=system("$cmd2");
+#  print "RETURN CODE=$rc\n";
+#  if ($rc != 0 ) {
+#    err_log (4, "smos_driver.pl", "$err_time","$prep_ID","-1",
+#             {'err_desc' => "Error running esa_downloader.py.  Check listing."});
+#    recd_state( $fl_name, FAILED, $tab_argv, $sched_dir, $sched_sts_fl );
+#    die "error reorganizing data at ${SMOS_STAGE}/${key}";
+#  }
+
 }
+
   ########################
   # Rename output listings
   ########################
