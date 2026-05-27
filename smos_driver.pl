@@ -360,6 +360,7 @@ foreach $key ( split(/,/, $SMOS_TYPES) ) {
   print "$cmd\n";
   $rc=system("$cmd");
   print "RETURN CODE=$rc\n";
+
   if ($rc != 0 ) {
     err_log (4, "smos_driver.pl", "$err_time","$prep_ID","-1",
 	     {'err_desc' => "Error running esa_downloader.py.  Check listing."});
@@ -367,15 +368,16 @@ foreach $key ( split(/,/, $SMOS_TYPES) ) {
     die "error running esa_downloader.py";
   }
 
-#  $cmd2 = "${SMOS_BASE}/reorg.sh";
-#  $rc=system("$cmd2");
-#  print "RETURN CODE=$rc\n";
-#  if ($rc != 0 ) {
-#    err_log (4, "smos_driver.pl", "$err_time","$prep_ID","-1",
-#             {'err_desc' => "Error running esa_downloader.py.  Check listing."});
-#    recd_state( $fl_name, FAILED, $tab_argv, $sched_dir, $sched_sts_fl );
-#    die "error reorganizing data at ${SMOS_STAGE}/${key}";
-#  }
+  $cmd2 = "bash ${SMOS_BASE}/reorg.sh";
+  print "bash ${SMOS_BASE}/reorg.sh";
+  $rc=system("$cmd2");
+  print "RETURN CODE=$rc\n";
+  if ($rc != 0 ) {
+    err_log (4, "smos_driver.pl", "$err_time","$prep_ID","-1",
+             {'err_desc' => "Error running esa_downloader.py.  Check listing."});
+    recd_state( $fl_name, FAILED, $tab_argv, $sched_dir, $sched_sts_fl );
+    die "error reorganizing data at ${SMOS_STAGE}/${key}";
+  }
 
 }
 
