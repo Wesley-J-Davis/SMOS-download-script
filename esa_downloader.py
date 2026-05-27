@@ -6,6 +6,7 @@ import getpass
 import os
 import zipfile
 import sys
+import yaml
 # ==========================================
 # 1. SEARCH SETTINGS & CREDENTIALS (ARGPARSE)
 # ==========================================
@@ -20,15 +21,14 @@ PRODUCT = args.product
 YEAR = args.year
 MONTH = args.month
 DAY = args.day
-
 # Open and read the YAML file
 try:
-    with open('config.yaml', 'r') as file:
+    with open('/home/dao_ops/operations/GIT-OPS/SMOS-download-script/config.yaml', 'r') as file:
         config = yaml.safe_load(file)
 
     # Access your credentials from the dictionary
-    username = config['credentials']['username']
-    password = config['credentials']['password']
+    username = config['remote-server']['username']
+    password = config['remote-server']['password']
 
 except FileNotFoundError:
     print("The configuration file was not found.")
@@ -147,12 +147,12 @@ for index, file_url in enumerate(zip_urls, start=1):
             for chunk in file_resp.iter_content(chunk_size=8192):
                 if chunk: f.write(chunk)
                     
-        print(f"  -> Extracting {local_zipname}...")
-        with zipfile.ZipFile(local_zipname, 'r') as zip_ref:
-            zip_ref.extractall(".")
+        #print(f"  -> Extracting {local_zipname}...")
+        #with zipfile.ZipFile(local_zipname, 'r') as zip_ref:
+        #    zip_ref.extractall(".")
             
-        os.remove(local_zipname)
-        print(f"  -> Cleaned up {local_zipname}.")
+        #os.remove(local_zipname)
+        #print(f"  -> Cleaned up {local_zipname}.")
         
     except Exception as e:
         print(f"  -> ERROR downloading or extracting {local_zipname}: {e}")
