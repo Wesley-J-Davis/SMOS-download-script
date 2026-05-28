@@ -369,7 +369,7 @@ foreach $key ( split(/,/, $SMOS_TYPES) ) {
   }
 
   $cmd2 = "bash ${SMOS_BASE}/reorg.sh";
-  print "bash ${SMOS_BASE}/reorg.sh";
+  print "bash ${SMOS_BASE}/reorg.sh\n";
   $rc=system("$cmd2");
   print "RETURN CODE=$rc\n";
   if ($rc != 0 ) {
