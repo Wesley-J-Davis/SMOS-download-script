@@ -121,7 +121,12 @@ zip_urls = list(set(zip_urls))
 
 if not zip_urls:
     print(f"\nNo matching files found for {search_term}.")
-    exit(0)
+    exit(1)
+
+if len(zip_urls) < 20:
+    print(f"\n{len(zip_urls)} is not enough matching files found for {search_term}.\nContact Provider.\n")
+    exit(1)
+
 
 print(f"Found {len(zip_urls)} matching files to download.\n")
 
