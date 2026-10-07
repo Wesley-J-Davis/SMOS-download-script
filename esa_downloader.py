@@ -125,11 +125,11 @@ for link in all_links:
 
 zip_urls = list(set(zip_urls))
 
-if not zip_urls:
+if not zip_urls and not FORCE:
     print(f"\nNo matching files found for {search_term}.")
     exit(1)
 
-if (len(zip_urls) < MIN and not FORCE):
+if (len(zip_urls) < int(MIN) and not FORCE):
     print(f"\n{len(zip_urls)} is not enough matching files found for {search_term}.\nContact Provider.\n")
     exit(1)
 
