@@ -4,7 +4,7 @@
 # processing.
 # 
 # 25Aug10 R. Lucchesi - initial implementation.
-# 23Jan16 W. Davis    - adapted for smos implementation
+# 23Jan26 W. Davis    - adapted for smos implementation
 # The setting of the options and the module lookup paths will
 # be done first using the BEGIN subroutine.  This section of the
 # program executes before the rest of the program is even compiled.
@@ -38,6 +38,7 @@ BEGIN {
 		'd:s',\$opt_d,
                 'a',\$opt_a,
                 'b',\$opt_b,
+                'F:s',\$opt_F,
         	'sched_cnfg:s',\$sched_cnfg,
             	'sched_id=s',\$sched_id,
             	'sched_synp:s',\$sched_synp,
@@ -309,6 +310,10 @@ $ENV{'SMOS'} = $SMOS_BASE;
 ( $SMOS_STAGE = extract_config( "SMOS_STAGE", $PREP_CONFIG_FILE, "NONE" ) ) ne "NONE"
    or die "(smos_driver.pl) ERROR - can not set SMOS_STAGE configuration value\n";
 
+( $MIN_FILES = extract_config( "MIN_FILES", $PREP_CONFIG_FILE, "NONE" ) ) ne "NONE"
+   or die "(smos_driver.pl) ERROR - can not set MIN_FILES configuration value\n";
+
+
 # Make directories, if needed.
 # identify output dirs and clean them prior to running
 # SMOS / FRP / FRP_FCS
@@ -352,7 +357,17 @@ foreach $key ( split(/,/, $SMOS_TYPES) ) {
   chdir("${SMOS_STAGE}/${key}") or die "Cannot change to directory '$directory': $!\n";
   my $current_dir = getcwd();
   print "Current directory is $current_dir\n";
-  $cmd_tmpl = "${SMOS_PYTHON_PATH}/python ${SMOS_BASE}/esa_downloader.py -p $key -y %y4 -m %m2 -d %d2";
+  # If force flag defined, call download a success even if not enough files, else min file check will controll success/failure
+  if ( defined( $opt_F ) ) {
+  }
+    print "Force flag set, forcing completion with less than desired number of files.\n";
+    $cmd_tmpl = "${SMOS_PYTHON_PATH}/python ${SMOS_BASE}/esa_downloader.py -p $key -y %y4 -m %m2 -d %d2 -M  $MIN_FILES -f True";
+  else {
+    print "Force flag unset, minimum file check will determine success / failure.\n";
+    $cmd_tmpl = "${SMOS_PYTHON_PATH}/python ${SMOS_BASE}/esa_downloader.py -p $key -y %y4 -m %m2 -d %d2 -M $MIN_FILES -f False";
+  }
+
+#  $cmd_tmpl = "${SMOS_PYTHON_PATH}/python ${SMOS_BASE}/esa_downloader.py -p $key -y %y4 -m %m2 -d %d2 -M  $MIN_FILES -f False";
   print "$cmd_tmpl\n";
 
   $cmd = token_resolve("${cmd_tmpl}", $process_date);
