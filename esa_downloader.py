@@ -16,7 +16,7 @@ parser.add_argument("-y", "--year", required=True, help="4-digit year (e.g., 202
 parser.add_argument("-m", "--month", required=True, help="2-digit month (e.g., 04)")
 parser.add_argument("-d", "--day", required=True, help="2-digit day (e.g., 22)")
 parser.add_argument("-M", "--minimum", required=True, help="minimum number of files needed (e.g., 20)")
-parser.add_argument("-f", "--force", required=True, help="force through with less than min (e.g True / False)")
+parser.add_argument("-F", "--force", action="store_true", required=False, help="force through with less than min")
 
 args = parser.parse_args()
 
@@ -129,10 +129,9 @@ if not zip_urls:
     print(f"\nNo matching files found for {search_term}.")
     exit(1)
 
-if (len(zip_urls) < MIN && ! force):
+if (len(zip_urls) < MIN and not FORCE):
     print(f"\n{len(zip_urls)} is not enough matching files found for {search_term}.\nContact Provider.\n")
     exit(1)
-
 
 print(f"Found {len(zip_urls)} matching files to download.\n")
 

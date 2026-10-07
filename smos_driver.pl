@@ -359,12 +359,13 @@ foreach $key ( split(/,/, $SMOS_TYPES) ) {
   print "Current directory is $current_dir\n";
   # If force flag defined, call download a success even if not enough files, else min file check will controll success/failure
   if ( defined( $opt_F ) ) {
-  }
+  
     print "Force flag set, forcing completion with less than desired number of files.\n";
-    $cmd_tmpl = "${SMOS_PYTHON_PATH}/python ${SMOS_BASE}/esa_downloader.py -p $key -y %y4 -m %m2 -d %d2 -M  $MIN_FILES -f True";
+    $cmd_tmpl = "${SMOS_PYTHON_PATH}/python ${SMOS_BASE}/esa_downloader.py -p $key -y %y4 -m %m2 -d %d2 -M  $MIN_FILES -F ";
+}
   else {
     print "Force flag unset, minimum file check will determine success / failure.\n";
-    $cmd_tmpl = "${SMOS_PYTHON_PATH}/python ${SMOS_BASE}/esa_downloader.py -p $key -y %y4 -m %m2 -d %d2 -M $MIN_FILES -f False";
+    $cmd_tmpl = "${SMOS_PYTHON_PATH}/python ${SMOS_BASE}/esa_downloader.py -p $key -y %y4 -m %m2 -d %d2 -M $MIN_FILES ";
   }
 
 #  $cmd_tmpl = "${SMOS_PYTHON_PATH}/python ${SMOS_BASE}/esa_downloader.py -p $key -y %y4 -m %m2 -d %d2 -M  $MIN_FILES -f False";
